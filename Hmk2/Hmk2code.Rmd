@@ -1,0 +1,114 @@
+---
+title: "Homework 2 code"
+output: html_notebook
+---
+
+http://r4ds.had.co.nz/
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+  ###   tidyverse will load in all the packages we will need to tidy 
+  ###   and plot our data
+
+```
+
+
+
+```{r}
+###   The data used here are from Hart, O'Hara, and Sirianni 2017
+###   "The Effect of Sustainability Commit- ments on College Admissions: 
+###     Evidence from the Presidents’ Climate Commitment"
+###   Which is currently being drooled over at JEEM 
+qual.dat <- read.csv("quality.csv")
+head(qual.dat)
+                      
+```
+
+
+```{r}
+###  This code does the manipulation for steps 1-3 on homework
+###  Then produces the graph for number 4
+
+vars <- c("unitid", "year", "satscale75", "public", signACUPCC = "treat", signatory = "tgroup", "rsalt", "rinc", "rtufe", "diplomas")
+sat_sum <- qual.dat %>%
+      select(one_of(vars)) %>%
+      rename(signACUPCC = treat, signatory = tgroup, 
+                   AvgProfSalary = rsalt,
+                   MedStateInc = rinc,
+                   Cost = rtufe) %>%
+      filter(!is.na(AvgProfSalary)) %>%
+      mutate(public = ifelse(public == 1, "public", "private")) %>%
+      group_by(year, public) %>%
+      summarise(avg.sat = mean(satscale75))
+
+ggplot(sat_sum, aes(x = year, y = avg.sat)) + 
+   geom_point(mapping = aes(x = year, y = avg.sat, color = public)) + 
+   geom_line(data = filter(sat_sum, public == "public"), color = "light blue") +
+   geom_line(data = filter(sat_sum, public == "private"), color = "orange") +
+  labs(title = "Average applications", y = "Applications")
+```
+
+
+```{r}
+###  This code produces the graph for number 5
+###  By grouping the data by 'signatory' rather than 'public'
+
+sat_sum2 <- qual.dat %>%
+      select(one_of(vars)) %>%
+      rename(signACUPCC = treat, signatory = tgroup, 
+                   AvgProfSalary = rsalt,
+                   MedStateInc = rinc,
+                   Cost = rtufe) %>%
+      filter(!is.na(AvgProfSalary)) %>%
+      mutate(signatory = ifelse(signatory == 1, "signatory", "nonsignatory")) %>%
+      group_by(year, signatory) %>%
+      summarise(avg.sat = mean(satscale75))
+
+ggplot(sat_sum2, aes(x = year, y = avg.sat)) + 
+   geom_point(mapping = aes(x = year, y = avg.sat, color = signatory)) + 
+   geom_line(data = filter(sat_sum2, signatory == "signatory"), color = "light blue") +
+   geom_line(data = filter(sat_sum2, signatory == "nonsignatory"), color = "orange") 
+```
+
+
+Now, can we get the graphs faceted by public and private schools?? 
+
+```{r}
+###   Question 6:
+###   Now the challenge. Can we facet the graph? 
+###   To do so requires that we have both the variables 
+###   public and signatory in the dataset.
+###   So, we need to group the data by both. 
+sat_sum3 <- qual.dat %>%
+      select(one_of(vars)) %>%
+      rename(signACUPCC = treat, signatory = tgroup, 
+                   AvgProfSalary = rsalt,
+                   MedStateInc = rinc,
+                   Cost = rtufe) %>%
+      filter(!is.na(AvgProfSalary)) %>%
+      mutate(public = ifelse(public == 1, "public", "private")) %>%
+      mutate(signatory = ifelse(signatory == 1, "signatory", "nonsignatory")) %>%
+      group_by(year, signatory, public) %>%  ## note the difference here
+      summarise(avg.sat = mean(satscale75))
+
+##  Tweak the classes on both variables
+  #sat_sum3$signatory <- as.factor(sat_sum3$signatory)
+  #sat_sum3$public <- as.factor(sat_sum3$public)
+
+###  Then plot 
+ggplot(sat_sum3, aes(x = year, y = avg.sat)) + 
+   geom_point(mapping = aes(x = year, y = avg.sat, color = signatory)) + 
+   geom_line(data = filter(sat_sum3, signatory == "signatory"), color = "light blue") +
+   geom_line(data = filter(sat_sum3, signatory == "nonsignatory"), color = "orange")  +
+  facet_wrap(~ public) + ggtitle("SAT Scores Private vs Public") + labs(x="Year", y="SAT Scores")
+```
+
+Almost like I knew what I was doing...
+
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+\documentclass[11pt]{article}
+\evensidemargin=0in \oddsidemargin=0in \textwidth=6.5in
+\topmargin=-0.5in \textheight=9in
+\usepackage{verbatim}
+\usepackage{graphicx}
+
+\begin{document}
+\baselineskip=12pt
+\begin{center}
+\textbf{Econ 510 Topics in Environmental and Resource Economics\\Fall MMXVII}
+\end{center}
+
+\center{\textbf{\emph{Homework 2}}\\ \emph{(due Thurs 9 Feb by 17:00 in the Blackboard folder)}}
+
+\smallskip
+
+\textbf{\emph{Homeworks should be written up in R markdown, then knitted into html files (button at the top of the code window) and then submitted through the Blackboard assignment. Don't give me the R notebook, just a knitted html. }}
+
+
+\bigskip
+
+Import the \underline{quality} data. Then do the following. You can pipe steps as you see fit as long as it is clear what you are doing at each stage.
+
+\begin{enumerate}
+
+\item Cut the data down to only the variables unitid, year, public, treat, tgroup, rsalt, rinc, rtufe, diplomas, and satscale75
+
+\item Rename the following variables
+     \begin{itemize}
+     \item treat $->$ signACUPCC
+     \item tgroup $->$ signatory
+     \item rsalt $->$ AvgProfSalary
+     \item rinc $->$ MedStateInc
+     \item rtufe $->$ Cost
+     \end{itemize} 
+     
+ \item Eliminate any observations with missing values. 
+     
+\item Produce a graph, similar to the one we did in class, showing average 75th percentile SAT scores (satscale75) for each year for public and private schools on the same graph. Change the data so that the legend on the side reads ``public" and ``private" rather than 0 and 1. Also, change the label on the y-axis to be ``SAT scores." And put a nice title on the graph, eh? 
+
+\item NOW, produce a similar plot, but showing average SAT scores for each year for signatory and nonsignatory schools on the same graph. (.i. separate the data by whether the school was a signatory rather than by the type of school. Savvy?)
+
+\item Now, see if you can produce a faceted graph (use \textbf{facet\_wrap}) showing this signatory/non-signatory plot separated by public and private schools. (Note: At the time of writing this, I have not tried to accomplish this. But anything CAN be done, it is just a matter of how to do it. But whether ggplot2 makes this simple, I do not know at this time.)
+ 
+
+
+\end{enumerate}
+
+
+\end{document}
