@@ -1,0 +1,53 @@
+\documentclass[11pt]{article}
+\evensidemargin=0in \oddsidemargin=0in \textwidth=6.5in
+\topmargin=-0.5in \textheight=9in
+\usepackage{verbatim}
+\usepackage{graphicx}
+
+\begin{document}
+\baselineskip=12pt
+\begin{center}
+\textbf{Econ 510 Topics in Environmental and Resource Economics\\Fall MMXVII}
+\end{center}
+
+\center{\textbf{\emph{Homework 1}}\\ \emph{(due Thurs 26 Jan by 17:00 in the Blackboard folder)}}
+
+\smallskip
+
+\textbf{\emph{Homeworks should be knitted into html files (button at the top of the code window) and then submitted through the Blackboard assignment. Don't give me the R notebook, just a knitted html. }}
+
+
+\bigskip
+
+Begin with the groundhog exercise that we used in class. Then make the following changes:
+
+\begin{enumerate}
+
+\item Do some research and find data on Phil's prediction for 2016, as well as some data that will allow you to determine whether or not there was an early Spring last year. Make sure you cite your sources (maybe in the code), and save web archive files of the pages to put into your documentation folder. You don't need to hand these in, but I want you to get in the habit of doing this when you search for information. 
+
+\item Using this data, add an observation for 2016 to the dataset $punx.dat$. NB: THIS WILL BE DONE IN THE CODE. We \underline{do not} want to change the original dataset in any way. No excel nonsense. Use good programming and add comments to describe where you are adding data. These expressions will be helpful in adding your variable: 
+\begin{itemize}
+\item $newob <- c(2106, ``shadow", ``febtemp", ``marchtemp")$ where you fill in the appropriate values so that it looks like the other observations. Make sure the string values are in quotation marks. 
+\item $punx.dat <- rbind(newob, punx.dat)$ NB: This statement will replace the old dataframe punx.dat with a new one and this one will be used in the rest of the code. 
+\end{itemize}
+
+\item Change the criteria for what is considered an early Spring. Now assume that both February and March must be Above average ("Slightly Above" no longer applies.) What these terms mean is something you may need to decide.
+
+\item Run through all of the code, making sure at each step that you are getting the correct results. 
+
+\item Change anything else in the document that must be consistent with the new results. .i. make sure everything that is written in the paper is consistent with your new results. 
+
+\item If you have any problems, remember the immortal words of Captain Jack Sparrow:
+
+
+\end{enumerate}
+
+
+  \begin{figure}[h]
+\begin{center}
+\includegraphics[scale=.15]{Jack-Sparrow-Quotes-7.jpg}
+\end{center}
+\end{figure}
+
+
+\end{document}

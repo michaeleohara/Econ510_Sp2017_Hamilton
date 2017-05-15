@@ -1,0 +1,131 @@
+---
+title: 'Punxsutawney Phil: Oracle or Deceiver?'
+author: "Michael O'Hara"
+date: "December 30, 2016"
+output:
+  html_notebook: default
+  html_document: default
+  pdf_document: default
+---
+```{r} 
+###  This just clears the workspace to avoid any confusion
+rm(list = ls())
+
+###   load packages we will need
+library(dplyr)
+library(ggplot2)
+library(stargazer)
+```
+
+Lore has it that Punxsutawney Phil can predict whether or not there will be an "early Spring". Every year, many people anxiously await his predictions. We are going to test his accuracy. 
+
+
+
+```{r} 
+###   Data comes from NOAA  last accessed 1/17/2017
+###   https://www.ncdc.noaa.gov/customer-support/education-resources/groundhog-day
+###   Input the data and take a look at it
+punx.dat <- read.table("../groundhog/Importable Data/record.csv", sep = ",", header = TRUE)
+
+###   add 2016 obs
+new.obs <- c(2016, "No","Above", "Above")
+punx.dat2 <- rbind(new.obs, punx.dat)
+punx.dat <- punx.dat2
+
+###   Stuff to check out
+  # dim(punx.dat)   #   check dimensions of dataframe
+  #class(punx.dat) # gives you class of object punx.dat
+  # lapply(punx.dat, class)   # applies the function class over the columns 
+                               # (variables) of punx.dat
+  # punx.dat$Year <- as.numeric(punx.dat$Year)  # change class of the year variable
+  # summary(punx.dat)
+  # stargazer(punx.dat, type = "text")
+# punx.dat
+
+```
+
+Now, we have to define what we mean by an "early Spring". Certainly, if both February and March are above average in temperature, that could be counted as an early Spring. But what about if February is below average and March is above? Our data also distinguishes between "above" and "below" versus "slightly above or below". We will create a new variable called "early.spring" that takes a 1 if there was an early Spring and a 0 if there was not. 
+
+
+```{r}
+
+###   Let's be generous with our definition of "Spring". If both February AND March are either "Above" or "Slightly Above", we will make early.spring a 1, otherwise it is 0. 
+attach(punx.dat)
+punx.dat$early.spring <- ifelse((FebTemp == "Above") &  (MarchTemp == "Above"), 1, 0)
+
+
+print("early.spring")
+punx.dat$early.spring
+
+detach(punx.dat)
+```
+
+There are `r sum(punx.dat$early.spring)` years in which this happens. 
+
+Next, we will create an indicator variable that takes a 1 if Phil predicts an early spring and a 0 if he did not. Seeing his shadow is interpreted by his minions as a prediction that winter will continue for another six weeks. Therefore, if the variable "Shadow" = "yes", our indicator variable predict.spring will take the value 0.   
+
+```{r}
+
+###   Create new variable predict.spring that = 1 if Phil DOES NOT see his shadow (Shadow = "No") and a 0 if he does (Shadow = "Yes")
+attach(punx.dat)
+punx.dat$predict.spring <- ifelse(Shadow == "Yes", 0, 1)
+
+print("predict.spring")
+punx.dat$predict.spring
+
+detach(punx.dat)
+```
+
+
+In order to test Phil's accuracy, we need to consider two cases. If he predicts an early Spring and we get one (as we define it), then this is a success. If he predicts more Winter and we get it, this is also a success. We create a variable called *good.hog* that indicates whether or not he predicted correctly. 
+
+```{r}
+
+###   Create variable good.hog that indicates whether the varmint predicted correctly
+###   This variable will take a 1 if predict.spring and early.spring take the same value (either 1 or 0)
+
+attach(punx.dat)
+punx.dat$good.hog <- ifelse(early.spring == predict.spring, 1, 0)
+
+###   Then we will allow for them also to be slightly above average
+###   NB: The else here is to leave the value as it currently is, .i. the value of punx.dat$early.spring
+
+#early.spring <- ifelse(FebTemp == "Slightly Above" & MarchTemp == "Slightly Above", 1, early.spring)
+
+print("good.hog")
+punx.dat$good.hog
+
+detach(punx.dat)
+phils.rec <- round(sum(punx.dat$good.hog)/nrow(punx.dat) ,4)
+```
+
+This gives Phil a success rate of `r phils.rec * 100`%
+
+Is this good? Well, let's do a simulation. Let's assume that Phil guesses completely at random for all `r nrow(punx.dat)` years for which we have data. So, we generate a series of `r nrow(punx.dat)` random guesses, with a probability of 0.5 of being right. Since this is random, each series of `r nrow(punx.dat)` guesses that we generate will have more or less correct guesses, with 50% being the average number of correct guesses. For example: 
+
+```{r}
+hog.sim <- rep(round(runif(nrow(punx.dat)), 0))
+correct <- sum(hog.sim)/ nrow(punx.dat)
+```
+
+generates a sample with a `r round(correct * 100,2)`% success rate. 
+
+So, let's generate a bunch of these samples. This will give us a look at what we should expect over time for a groundhog that is guessing at random. Suppose we generate 1000 samples all of size `r nrow(punx.dat)`. Figure 1 shows the distribution of the percentage of correct guesses we should expect. 
+
+```{r}
+nrep <- 1000
+rand.hogs <- rep(NA,nrep)
+for(i in 1:nrep){ 
+hog.sim <- rep(round(runif(nrow(punx.dat)), 0))
+rand.hogs[i] <- sum(hog.sim)/ nrow(punx.dat)
+}
+hist(rand.hogs)  #, breaks = 50)
+ #text(.6, 100, labels = "This is my histogram")
+
+##  compute the percentage of values that are greater than Phil's past performance 
+##  success rate
+bettern.phil <- ifelse(rand.hogs > phils.rec,1,0)
+p.val <- sum(bettern.phil)/nrep
+```
+
+The probability of getting a success rate at least this good using random guessing is `r round(p.val,2)`. This is pretty high. Therefore, we cannot reject the hypothesis that Phil is just guessing at random rather than having any real information. In other words, statistically speaking, we have no evidence that Phil has any sort of ability at all to separate him from other varmints.  
