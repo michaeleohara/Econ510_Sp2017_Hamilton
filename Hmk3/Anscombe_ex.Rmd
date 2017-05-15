@@ -1,0 +1,55 @@
+---
+title: "Thou shalt know thy data"
+author: "Your name here"
+output:
+  html_notebook: default
+  html_document: default
+  pdf_document: default
+---
+
+The point of this exercise is to convince you that you should examine your data closely and know what it looks like before stuffing it into a fancy regression model. 
+
+```{r include = FALSE}
+rm(list = ls())
+#library(xlsx)
+library(tidyverse)
+library(stargazer)
+library(knitr)
+library(pander)
+#library(data.table)
+#library(RCurl)
+
+data <- read.csv("anscombe.csv")
+                   
+```
+
+
+1. Create a table of summary statistics of the variables using stargazer: 
+```{r echo = FALSE, message = FALSE, warnings = FALSE, results = "asis"}
+###   Check out summary stats of the data
+
+
+```
+
+
+2. Create a set of scatter plots for each set of variables, by plotting y1 against x1, y2 against x2, etc. How do they look to you? Does it look like a linear regression model will be a good fit for each dataset?  
+```{r echo = FALSE, message = FALSE, warnings = FALSE, results = "asis"}
+###  These can be done separately, or you can transform the data to do a faceted plot
+
+
+```
+
+
+3. Now, run regressions on these sets. Collect the results into one stargazer table. What do you notice about the results? 
+
+```{r echo = FALSE, message = FALSE, warnings = FALSE, results = "asis"}
+###  if we want the numbers:
+
+
+```
+
+
+
+
+4. What would you conclude about trusting regression results without knowing what the data looks like first? 
+
