@@ -25,7 +25,7 @@ Lore has it that Punxsutawney Phil can predict whether or not there will be an "
 ###   Data comes from NOAA  last accessed 1/17/2017
 ###   https://www.ncdc.noaa.gov/customer-support/education-resources/groundhog-day
 ###   Input the data and take a look at it
-punx.dat <- read.table("../groundhog/Importable Data/record.csv", sep = ",", header = TRUE)
+punx.dat <- read.table("record.csv", sep = ",", header = TRUE)
 
 ###   add 2016 obs
 new.obs <- c(2016, "No","Above", "Above")
