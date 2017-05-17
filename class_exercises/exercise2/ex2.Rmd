@@ -1,0 +1,98 @@
+---
+title: "HOS replication"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+This is a replication of some work from a brilliant paper by Hart, O'Hara, and Sirianni that is currently being drooled over by referees at JEEM. 
+
+```{r message = FALSE, warning = FALSE}
+rm(list = ls())
+library(tidyverse)
+  ###   tidyverse will load in all the packages we will need to tidy 
+  ###   and plot our data
+
+```
+
+
+
+```{r}
+###  data from Hart, O'Hara, and Sirianni (2017)
+quant.dat <- read.csv("quantity.csv")
+```
+
+```{r}
+###  I did these manipulations all step by step for illustration.
+###  Later we will pipe them together. 
+###  Reduce the dataset to just the variables we are interested in
+
+vars <- c("unitid", "year", "apps", "public", signACUPCC = "treat", signatory = "tgroup", "rsalt", "rinc", "rtufe", "diplomas")
+quant.dat <- select(quant.dat, one_of(vars))
+
+###  give some of them better names
+quant.dat <- rename(quant.dat, signACUPCC = treat, signatory = tgroup)
+
+###  eliminate any missing values
+quant.dat <- filter(quant.dat, !is.na(rsalt))
+```
+
+```{r}
+###   count number of schools in different groups
+###   signatories and non-signatories, public and private
+
+groups.count <- tally(group_by(quant.dat, public, signatory))
+#groups.count
+
+###   aggregate public and private schools to their means for each year
+by_public <- group_by(quant.dat, year, public)
+app_sum <- summarise(by_public,
+                     avg.apps = mean(apps))
+##  Turn public variable from a binary into a factor
+  app_sum$type <- ifelse(app_sum$public == 1, "public", "private")
+
+ggplot(app_sum, aes(x = year, y = avg.apps)) + 
+   geom_point(mapping = aes(x = year, y = avg.apps, color = type))
+```
+
+```{r}
+ggplot(app_sum, aes(x = year, y = avg.apps)) + 
+   geom_point(mapping = aes(x = year, y = avg.apps)) +
+  facet_wrap(~ type)
+```
+
+```{r}
+###   suppose I want line graphs of public and private
+
+ggplot(app_sum, aes(x = year, y = avg.apps)) + 
+   geom_point(mapping = aes(x = year, y = avg.apps, color = type)) + 
+   geom_line(mapping = aes(x = year, y = avg.apps, group = type, color = type)) 
+  
+```
+
+
+```{r}
+###  Doing all of the same thing with the 'pipe'
+
+rm(list = ls())
+quant.dat <- read.csv("quantity.csv")
+
+
+vars <- c("unitid", "year", "apps", "public", signACUPCC = "treat", signatory = "tgroup", "rsalt", "rinc", "rtufe", "diplomas")
+app_sum <- quant.dat %>%
+      select(one_of(vars)) %>%
+      rename(signACUPCC = treat, signatory = tgroup) %>%
+      filter(!is.na(rsalt)) %>%
+      mutate(type = ifelse(public == 1, "public", "private")) %>%
+      group_by(year, type) %>%
+      summarise(avg.apps = mean(apps))
+
+ggplot(app_sum, aes(x = year, y = avg.apps)) + 
+   geom_point(mapping = aes(x = year, y = avg.apps, color = type)) + 
+   geom_line(mapping = aes(x = year, y = avg.apps, group = type, color = type)) 
+  
+```
+
+
+
+
